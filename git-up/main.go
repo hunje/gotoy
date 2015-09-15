@@ -11,23 +11,26 @@ import (
 var targetRepository string
 var forceUpdate bool
 
-const WHITE_SPACES string = " \t\n"
-
 func init() {
 	flag.StringVar(&targetRepository, "t", "", "target repository")
 	flag.BoolVar(&forceUpdate, "f", false, "set to force update")
 	flag.Parse()
 }
 
-func getCurrentBranchName() string {
-	cmd := exec.Command("git", "get-branch-name")
+func ExecCommand(commands []string) string {
+	cmd := exec.Command(commands[0], commands[1:]...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	err := cmd.Run()
 	if err != nil {
 		return ""
 	}
-	return strings.TrimRight(out.String(), WHITE_SPACES)
+	return strings.TrimSpace(out.String())
+}
+
+func GetBranchName() string {
+	commands := []string{"git", "rev-parse", "--abbrev-ref", "HEAD"}
+	return ExecCommand(commands)
 }
 
 func main() {
@@ -38,7 +41,7 @@ func main() {
 
 	commands := []string{"push"}
 
-	currentBranch := getCurrentBranchName()
+	currentBranch := GetBranchName()
 
 	if len(currentBranch) <= 0 {
 		fmt.Println("here is not under git")
