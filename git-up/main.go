@@ -9,11 +9,13 @@ import (
 )
 
 var targetRepository string
+var forceUpdate bool
 
 const WHITE_SPACES string = " \t\n"
 
 func init() {
 	flag.StringVar(&targetRepository, "t", "", "target repository")
+	flag.BoolVar(&forceUpdate, "f", false, "set to force update")
 	flag.Parse()
 }
 
@@ -34,6 +36,8 @@ func main() {
 		return
 	}
 
+	commands := []string{"push"}
+
 	currentBranch := getCurrentBranchName()
 
 	if len(currentBranch) <= 0 {
@@ -41,12 +45,18 @@ func main() {
 		return
 	}
 
-	fmt.Println("git", "push", targetRepository, currentBranch)
-	// cmd := exec.Command("git", "push", targetRepository, currentBranch)
+	if forceUpdate == true {
+		commands = append(commands, "-f")
+	}
+
+	commands = append(commands, targetRepository)
+	commands = append(commands, currentBranch)
+
+	fmt.Println(commands)
 	var output bytes.Buffer
 	var errOut bytes.Buffer
 
-	cmd := exec.Command("git", "push", targetRepository, currentBranch)
+	cmd := exec.Command("git", commands...)
 	cmd.Stdout = &output
 	cmd.Stderr = &errOut
 	cmd.Run()
