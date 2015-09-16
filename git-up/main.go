@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"github.com/hunje/gotoy/tool"
 	"os/exec"
-	"strings"
 )
 
 var targetRepository string
@@ -17,20 +17,9 @@ func init() {
 	flag.Parse()
 }
 
-func ExecCommand(commands []string) string {
-	cmd := exec.Command(commands[0], commands[1:]...)
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		return ""
-	}
-	return strings.TrimSpace(out.String())
-}
-
 func GetBranchName() string {
 	commands := []string{"git", "rev-parse", "--abbrev-ref", "HEAD"}
-	return ExecCommand(commands)
+	return tool.ExecCommand(commands)
 }
 
 func main() {
